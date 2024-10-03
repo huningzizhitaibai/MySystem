@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"myTestProject/models"
 	"myTestProject/mysql"
 	"net/http"
 )
@@ -47,20 +48,19 @@ func main() {
 		} else {
 			//登录失败
 			//重新返回渲染登录界面
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "登录失败",
-			})
-			}
+			c.Redirect(302, "/login")
 		}
 	})
 
 	//处理用户注册
 	MySystem.POST("/signup", func(c *gin.Context) {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
-		//comfirm := c.PostForm("comfirm")
-		//email := c.PostForm("email")
-		result := mysql.AddNewUser(username, password)
+		User := models.UserInfoBasic{
+			Username: c.PostForm("username"),
+			Password: c.PostForm("password"),
+			Email:    c.PostForm("email"),
+		}
+
+		result := mysql.AddNewUser(User)
 		if result {
 			c.JSON(http.StatusCreated, gin.H{
 				"msg": "注册成功",
@@ -71,6 +71,7 @@ func main() {
 			})
 		}
 	})
+
 	MySystem.Run(":8080")
 }
 

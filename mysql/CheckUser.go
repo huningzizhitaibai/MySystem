@@ -10,7 +10,7 @@ func CheckUser(username string, password string) bool {
 		return false
 	}
 
-	res, err := db.Query("select password from users_for_login where username = ?", username)
+	res, err := db.Query("select password from UserInfoBasic where username = ?", username)
 	if err != nil {
 		fmt.Println("unfind password")
 		return false
