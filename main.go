@@ -46,7 +46,11 @@ func main() {
 			})
 		} else {
 			//登录失败
-			c.JSON(http.StatusForbidden, gin.H{})
+			//重新返回渲染登录界面
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "登录失败",
+			})
+			}
 		}
 	})
 

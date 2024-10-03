@@ -14,9 +14,9 @@ func TestCheckUser(t *testing.T) {
 	result2 := mysql.CheckUser(_username, _wrongpassword)
 
 	if result1 == true {
-		t.Log("测试成功，密码正确")
+		t.Log("测试失败，用户名不正确")
 	} else {
-		t.Log("测试错误，函数错误")
+		t.Log("测试成功，函数错误")
 	}
 
 	if result2 == true {
