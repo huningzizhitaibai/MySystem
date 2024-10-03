@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"myTestProject/mysql"
 	"net/http"
 )
 
@@ -20,9 +21,14 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	//填写登录数据
+	//渲染填写登录数据的页面
 	MySystem.GET("/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", nil)
+	})
+
+	//渲染注册的页面
+	MySystem.GET("/signup", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "signup.html", nil)
 	})
 
 	//处理用户登录
@@ -32,14 +38,35 @@ func main() {
 		password := c.PostForm("password")
 
 		//对用户的账户进行登录的验证
-
-		c.JSON(200, gin.H{
-			"msg":      "OK",
-			"username": username,
-			"password": password,
-		})
+		result := mysql.CheckUser(username, password)
+		if result {
+			c.JSON(http.StatusOK, gin.H{
+				"msg":      "登录成功",
+				"username": username,
+			})
+		} else {
+			//登录失败
+			c.JSON(http.StatusForbidden, gin.H{})
+		}
 	})
 
+	//处理用户注册
+	MySystem.POST("/signup", func(c *gin.Context) {
+		username := c.PostForm("username")
+		password := c.PostForm("password")
+		//comfirm := c.PostForm("comfirm")
+		//email := c.PostForm("email")
+		result := mysql.AddNewUser(username, password)
+		if result {
+			c.JSON(http.StatusCreated, gin.H{
+				"msg": "注册成功",
+			})
+		} else {
+			c.JSON(http.StatusForbidden, gin.H{
+				"msg": "注册失败",
+			})
+		}
+	})
 	MySystem.Run(":8080")
 }
 

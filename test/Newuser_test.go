@@ -6,7 +6,12 @@ import (
 )
 
 func TestNewuser(t *testing.T) {
-	username := "huning"
-	password := "123456"
-	mysql.AddNewUser(username, password)
+	username := "Lee"
+	password := "177533"
+	result := mysql.AddNewUser(username, password)
+	if result {
+		t.Log("success")
+	} else {
+		t.Log("fail")
+	}
 }
