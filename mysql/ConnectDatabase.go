@@ -7,8 +7,12 @@ import (
 	"log"
 )
 
-func ConnectMyDatabase(user string, password string, ip string) (db *sql.DB) {
+func ConnectMyDatabase() (db *sql.DB) {
 	//成功连接位于服务器上的mysql数据库
+
+	user := "huning"
+	password := "Beingalone.1216"
+	ip := "47.98.147.86"
 
 	dsn := user + ":" + password + "@tcp(" + ip + ")/gogin"
 	db, err := sql.Open("mysql", dsn)

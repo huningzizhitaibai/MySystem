@@ -5,7 +5,8 @@ import (
 )
 
 func AddNewUser(username, password string) {
-	db := ConnectMyDatabase("huning", "Beingalone.1216", "47.98.147.86")
+	//连接上我的数据库
+	db := ConnectMyDatabase()
 
 	//说明连接数据库失败了
 	if db == nil {
@@ -35,4 +36,7 @@ func AddNewUser(username, password string) {
 		fmt.Println("查找操作行错误")
 	}
 	fmt.Println("id: %d  affected: %d", id, aff)
+
+	//执行完增加操作后就将数据库进行关闭
+	defer db.Close()
 }

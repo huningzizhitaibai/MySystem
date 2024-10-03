@@ -27,8 +27,12 @@ func main() {
 
 	//处理用户登录
 	MySystem.POST("/login", func(c *gin.Context) {
+		//从这里获得了，之前用户填写的相关数据
 		username := c.PostForm("username")
 		password := c.PostForm("password")
+
+		//对用户的账户进行登录的验证
+
 		c.JSON(200, gin.H{
 			"msg":      "OK",
 			"username": username,
