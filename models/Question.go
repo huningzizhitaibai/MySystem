@@ -1,7 +1,7 @@
 package models
 
 type Question struct {
-	title   string
-	tag     string
-	content string
+	Title   string
+	Tag     string
+	Content string
 }

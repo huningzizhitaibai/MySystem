@@ -1,5 +1,6 @@
 package models
 
 type Answer struct {
-	content string
+	Content  string
+	Provider string
 }

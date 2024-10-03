@@ -41,10 +41,7 @@ func main() {
 		//对用户的账户进行登录的验证
 		result := mysql.CheckUser(username, password)
 		if result {
-			c.JSON(http.StatusOK, gin.H{
-				"msg":      "登录成功",
-				"username": username,
-			})
+			c.Redirect(302, "/home")
 		} else {
 			//登录失败
 			//重新返回渲染登录界面
@@ -62,12 +59,53 @@ func main() {
 
 		result := mysql.AddNewUser(User)
 		if result {
-			c.JSON(http.StatusCreated, gin.H{
-				"msg": "注册成功",
-			})
+			c.Redirect(302, "/login")
 		} else {
-			c.JSON(http.StatusForbidden, gin.H{
-				"msg": "注册失败",
+			c.Redirect(302, "/signup")
+		}
+	})
+
+	//渲染首页
+	MySystem.GET("/home", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "home.html", nil)
+	})
+
+	//渲染提问的网页
+	MySystem.GET("/ask", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "ask.html", nil)
+	})
+
+	//提交新的问题
+	MySystem.POST("/ask", func(c *gin.Context) {
+		Question := models.Question{
+			c.PostForm("title"),
+			c.PostForm("tag"),
+			c.PostForm("content"),
+		}
+		result := mysql.AddNewQuestion(Question)
+
+		if result {
+			c.Redirect(302, "/home")
+		} else {
+			c.Redirect(302, "/ask")
+		}
+	})
+
+	//渲染搜索的页面
+	MySystem.GET("/search", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "search.html", nil)
+	})
+
+	//提交搜索的关键词
+	MySystem.POST("/search", func(c *gin.Context) {
+		keyword := c.PostForm("keyword")
+		qids := mysql.SearchInDatabase(keyword)
+		for _, qid := range qids {
+			question := mysql.ShowQuestionByQid(qid)
+			c.JSON(200, gin.H{
+				"title":   question.Title,
+				"tag":     question.Tag,
+				"content": question.Content,
 			})
 		}
 	})
