@@ -6,6 +6,7 @@ import (
 	"myTestProject/models"
 	"myTestProject/mysql"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -78,7 +79,24 @@ func main() {
 
 		//提交回答的答案
 		userGroup.POST("/answer", func(c *gin.Context) {
-
+			userclaim, _ := middle.ParseToken(c.GetHeader("Authorization"))
+			qid, _ := strconv.Atoi(c.PostForm("qid"))
+			answer := models.Answer{
+				c.PostForm("content"),
+				mysql.CheckUsernameByID(int(userclaim.UserID)),
+				//这里将回答相关问题的id值设成了表单传入，主要是不知道怎么合理设置路由了
+				qid,
+			}
+			ret := mysql.AddNewAnswer(answer)
+			if ret {
+				c.JSON(http.StatusCreated, gin.H{
+					"msg": "创建回答成功",
+				})
+			} else {
+				c.JSON(http.StatusExpectationFailed, gin.H{
+					"msg": "创建回答失败",
+				})
+			}
 		})
 
 	}
@@ -109,7 +127,7 @@ func main() {
 		//对用户的账户进行登录的验证
 		result := mysql.CheckUser(username, password)
 		if result {
-			token, _ := middle.GenerateToken(123456)
+			token, _ := middle.GenerateToken(int64(mysql.GetUidByUsername(username)))
 			c.JSON(200, gin.H{
 				"token": token,
 			})

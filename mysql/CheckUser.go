@@ -22,7 +22,7 @@ func CheckUser(username string, password string) bool {
 		err = res.Scan(&r_password)
 
 		//测试获得的密码是什么
-		fmt.Println(r_password)
+		//fmt.Println(r_password)
 
 		if err != nil {
 			return false
