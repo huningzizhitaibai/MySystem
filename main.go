@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"myTestProject/middle"
 	"myTestProject/models"
@@ -62,14 +63,16 @@ func main() {
 		userGroup.POST("/search", func(c *gin.Context) {
 			keyword := c.PostForm("keyword")
 			qids := mysql.SearchInDatabase(keyword)
+			var Questons []models.Question
 			for _, qid := range qids {
 				question := mysql.ShowQuestionByQid(qid)
-				c.JSON(200, gin.H{
-					"title":   question.Title,
-					"tag":     question.Tag,
-					"content": question.Content,
-				})
+				Questons = append(Questons, question)
 			}
+			result, err := json.Marshal(Questons)
+			if err != nil {
+				c.JSON(http.StatusExpectationFailed, gin.H{})
+			}
+			c.Data(200, "application/json; charset=utf-8", result)
 		})
 
 		//渲染回答的页面
@@ -97,6 +100,27 @@ func main() {
 					"msg": "创建回答失败",
 				})
 			}
+		})
+
+		//提供特定的问题的先关数据
+		//包括提问和它相关的回答
+		//算了，还是只实现返回相关问题体吧，两种不同结构的数据不知道怎么处理了
+		userGroup.GET("/question/:qid", func(c *gin.Context) {
+			qid, _ := strconv.Atoi(c.Param("qid"))
+			//暂时先不写了
+			//question := mysql.GetQuestionByQid(qid)
+			aids := mysql.SearchAidsByQid(qid)
+			var Answers []models.Answer
+			for _, aid := range aids {
+				answer := mysql.GetAnswerByAid(aid)
+				Answers = append(Answers, answer)
+			}
+			result, err := json.Marshal(Answers)
+			if err != nil {
+				c.JSON(http.StatusExpectationFailed, gin.H{})
+			}
+			c.Data(200, "application/json; charset=utf-8", result)
+
 		})
 
 	}
