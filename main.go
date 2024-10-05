@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"myTestProject/AI"
 	"myTestProject/middle"
 	"myTestProject/models"
 	"myTestProject/mysql"
@@ -123,6 +125,32 @@ func main() {
 
 		})
 
+		//调用大语言模型为用户提供回答
+		userGroup.GET("/question/AI", func(c *gin.Context) {
+			//这里使用Param方法是无法正常得到qid参数的，是为啥
+			qid, _ := strconv.Atoi(c.Query("qid"))
+			question := mysql.GetQuestionByQid(qid)
+
+			answer := AI.AIapi(question.Content)
+			//这个地方不能写python3估计是识别不出来，他也没做分类
+			//cmd := exec.Command("python", "./AI/AIpic.py", question.Content)
+			//out, _ := cmd.CombinedOutput()
+			//src := string(out)
+			//str := common.ReplaceForMe(src)
+			//utf8Bytes := []byte(str)
+			//
+			//// 将字节切片转换为字符串
+			//answer := string(utf8Bytes)
+
+			// 打印字符串
+			fmt.Println(answer)
+			c.JSON(http.StatusOK, gin.H{
+				"answer": answer,
+			})
+		})
+
+		//删除相关
+		userGroup.DELETE("/question/:qid", func(c *gin.Context) {})
 	}
 	//加载静态页面,但是我理解的这里可能只是将所有的页面进行了缓存
 	MySystem.LoadHTMLGlob("template/*.html")
